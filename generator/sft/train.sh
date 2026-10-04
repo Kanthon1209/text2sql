@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 生成器 E09：完整提示词 -> 标注查询。Qwen3.5-4B LoRA。
 # 复现：先运行 export_jsonl.py，卡空出来后再运行本脚本。超参全部写在这里。
-# 默认 1 号卡。E09 推理若仍占着 1 号卡，不要同时启动。
+# 0 号卡和 1 号卡一起训。每卡 batch 1、梯度累积 8，全局批次仍是 16。
 # 套上 Qwen3.5 对话模板后最长 2728 token，max_length 4096 不会截断。
 # 4 个 epoch：SQL 比 Router 的短 JSON 长，2 遍不够；再多主要是贴训练题原句。
 set -euo pipefail
@@ -16,7 +16,9 @@ DATA="$ROOT/train.jsonl"
 mkdir -p "$ROOT"
 test -f "$DATA"
 
-export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-1}"
+export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0,1}"
+export NPROC_PER_NODE="${NPROC_PER_NODE:-2}"
+export MASTER_PORT="${MASTER_PORT:-29501}"
 export PYTHONHASHSEED=20261001
 
 swift sft \
@@ -37,7 +39,7 @@ swift sft \
   --learning_rate 1e-4 \
   --num_train_epochs 4 \
   --per_device_train_batch_size 1 \
-  --gradient_accumulation_steps 16 \
+  --gradient_accumulation_steps 8 \
   --max_length 4096 \
   --warmup_ratio 0.05 \
   --gradient_checkpointing true \
