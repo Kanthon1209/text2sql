@@ -3,6 +3,7 @@
 # 复现：先运行 export_jsonl.py，卡空出来后再运行本脚本。超参全部写在这里。
 # 默认 1 号卡。E09 推理若仍占着 1 号卡，不要同时启动。
 # 套上 Qwen3.5 对话模板后最长 2728 token，max_length 4096 不会截断。
+# 4 个 epoch：SQL 比 Router 的短 JSON 长，2 遍不够；再多主要是贴训练题原句。
 set -euo pipefail
 
 source /root/miniconda3/etc/profile.d/conda.sh
@@ -34,7 +35,7 @@ swift sft \
   --lora_alpha 16 \
   --lora_dropout 0.05 \
   --learning_rate 1e-4 \
-  --num_train_epochs 2 \
+  --num_train_epochs 4 \
   --per_device_train_batch_size 1 \
   --gradient_accumulation_steps 16 \
   --max_length 4096 \
