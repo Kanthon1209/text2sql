@@ -1,0 +1,36 @@
+{
+  "variant": "generator-e09",
+  "source": "/data/data/v2-w/train_eknow.json",
+  "output": "/data/k/runs/generator-e09/train.jsonl",
+  "prompt": "与 experiments/run_ready.py 的 E09 相同。数据源、库名、表名和知识用标注，相似案例来自 similar_top10_scored.json。",
+  "rows": 5920,
+  "questions": 5830,
+  "by_source": {
+    "MYSQL": 2059,
+    "Elasticsearch": 370,
+    "POSTGRESQL": 500,
+    "SQLite": 2991
+  },
+  "by_step": {
+    "0": 5740,
+    "1": 90,
+    "2": 90
+  },
+  "chars": {
+    "min": 726,
+    "p50": 1788,
+    "p90": 2747,
+    "p99": 4438,
+    "max": 7972
+  },
+  "tokens": {
+    "tokenizer": "/data/models/Qwen3.5-4B",
+    "min": 311,
+    "p50": 688,
+    "p90": 1022,
+    "p99": 1603,
+    "max": 2728,
+    "over_4096": 0
+  },
+  "sha256": "548351ea9bcc45131a1881e1d9e45058788db5ce6f24bf5954dfc59c11725a29"
+}
