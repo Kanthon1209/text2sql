@@ -54,10 +54,13 @@ def score(gold: dict, pred: dict) -> dict:
 
 
 def latest_checkpoint(run: Path) -> Path:
-    checkpoints = sorted(run.glob("checkpoint-*"), key=lambda path: int(path.name.split("-")[-1]))
+    checkpoints = [
+        path for path in run.rglob("checkpoint-*")
+        if path.is_dir() and (path / "adapter_model.safetensors").exists()
+    ]
     if not checkpoints:
         raise SystemExit(f"没有 checkpoint：{run}")
-    return checkpoints[-1]
+    return max(checkpoints, key=lambda path: int(path.name.split("-")[-1]))
 
 
 def main() -> None:
@@ -83,6 +86,7 @@ def main() -> None:
         attn_impl="sdpa",
         use_hf=True,
     )
+    engine.template.enable_thinking = False
     config = RequestConfig(max_tokens=512, temperature=0)
     totals = Counter()
     by_source = {}
@@ -116,7 +120,17 @@ def main() -> None:
         "step_acc": totals["steps"] / n,
         "full_acc": totals["full"] / n,
         "json_ok": totals["json_ok"] / n,
-        "by_source": {key: {"n": value["n"], "full": value["full"], "source": value["source"]} for key, value in by_source.items()},
+        "by_source": {
+            key: {
+                "n": value["n"],
+                "full": value["full"],
+                "source": value["source"],
+                "databases": value["databases"],
+                "tables": value["tables"],
+                "steps": value["steps"],
+            }
+            for key, value in by_source.items()
+        },
     }
     out = args.output or (args.run / "eval")
     out.mkdir(parents=True, exist_ok=True)
