@@ -515,7 +515,7 @@ def infer(out: Path, shard: int, shards: int, base_url: str, device: str) -> Non
     client = None
     engine = None
     config = None
-    if device == "cpu":
+    if device in {"cpu", "cuda"}:
         import torch
         from swift.infer_engine import RequestConfig, TransformersEngine
 
@@ -523,9 +523,9 @@ def infer(out: Path, shard: int, shards: int, base_url: str, device: str) -> Non
             MODEL,
             model_type="qwen3_5",
             template_type="qwen3_5",
-            torch_dtype=torch.float32,
+            torch_dtype=torch.float32 if device == "cpu" else torch.bfloat16,
             attn_impl="sdpa",
-            device_map="cpu",
+            device_map="cpu" if device == "cpu" else {"": 0},
             use_hf=True,
             max_batch_size=1,
         )
@@ -631,7 +631,7 @@ def main() -> None:
     parser.add_argument("--shard", type=int, default=0)
     parser.add_argument("--shards", type=int, default=1)
     parser.add_argument("--base-url", default="http://127.0.0.1:8002/v1")
-    parser.add_argument("--device", choices=["api", "cpu"], default="api")
+    parser.add_argument("--device", choices=["api", "cpu", "cuda"], default="api")
     args = parser.parse_args()
     if args.stage == "route":
         route(args.output, args.batch_size)
