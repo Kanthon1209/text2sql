@@ -53,3 +53,9 @@ python /data/k/generator/router/eval.py
 ```bash
 bash /data/k/experiments/run_v1.sh
 ```
+
+测试集 `/data/raw/contest_8/QA_test.json` 只有问题和题号。目前能跑的是 E01，结果在 `/data/k/runs/experiments-test-v1`。E02、E03 要先用 Router 对这 400 题推理出数据源、库名、表名。E05 还要先检索知识点。
+
+```bash
+bash /data/k/experiments/run_test.sh
+```
