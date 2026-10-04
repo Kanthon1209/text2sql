@@ -1,0 +1,30 @@
+{
+  "version": "sft-v2",
+  "rows": 5920,
+  "repair_rows": 976,
+  "repair_too_long": 10,
+  "by_source": {
+    "MYSQL": 1969,
+    "Elasticsearch": 370,
+    "POSTGRESQL": 410,
+    "CROSS": 90,
+    "SQLite": 2991
+  },
+  "similar_cases": {
+    "0": 246,
+    "1": 201,
+    "2": 5383
+  },
+  "with_rule_knowledge": 843,
+  "with_table_knowledge": 2991,
+  "failed_steps_left": 0,
+  "token_min": 258,
+  "token_p50": 876,
+  "token_p90": 1823,
+  "token_p99": 3778,
+  "token_max": 5155,
+  "over_4096": 24,
+  "sha256": "2043e7dae3ee31f8a1cdd1ed7297a782dfce4cf704bf41ac2c10d3cfca4f75b7",
+  "train": "/data/data/v2-w/train_eknow.json",
+  "e09_preds": "/data/k/runs/e09/E09/predictions.jsonl"
+}
