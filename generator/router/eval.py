@@ -69,6 +69,7 @@ def main() -> None:
     parser.add_argument("--run", type=Path, default=RUN)
     parser.add_argument("--model", default=MODEL)
     parser.add_argument("--limit", type=int, default=0)
+    parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--output", type=Path, default=None)
     args = parser.parse_args()
     from swift.infer_engine import InferRequest, RequestConfig, TransformersEngine
@@ -85,29 +86,34 @@ def main() -> None:
         torch_dtype="bfloat16",
         attn_impl="sdpa",
         use_hf=True,
+        max_batch_size=args.batch_size,
     )
     engine.template.enable_thinking = False
     config = RequestConfig(max_tokens=512, temperature=0)
     totals = Counter()
     by_source = {}
     details = []
-    for index, row in enumerate(rows, start=1):
-        messages = row["messages"]
-        gold = json.loads(messages[-1]["content"])
-        response = engine.infer([InferRequest(messages=messages[:-1])], config)[0]
-        text = response.choices[0].message.content or ""
-        pred = parse_json(text)
-        item = score(gold, pred)
-        item.update({"source_gold": gold.get("source"), "pred": text})
-        details.append(item)
-        bucket = by_source.setdefault(gold.get("source"), Counter())
-        for key in ("json_ok", "source", "databases", "tables", "steps", "full"):
-            totals[key] += int(item[key])
-            bucket[key] += int(item[key])
-        bucket["n"] += 1
-        totals["n"] += 1
-        if index % 20 == 0 or index == len(rows):
-            print(f"{index}/{len(rows)} full {totals['full']}/{totals['n']}", flush=True)
+    batch = max(1, args.batch_size)
+    for start in range(0, len(rows), batch):
+        chunk = rows[start:start + batch]
+        requests = [InferRequest(messages=row["messages"][:-1]) for row in chunk]
+        responses = engine.infer(requests, config)
+        for row, response in zip(chunk, responses):
+            gold = json.loads(row["messages"][-1]["content"])
+            text = response.choices[0].message.content or ""
+            pred = parse_json(text)
+            item = score(gold, pred)
+            item.update({"source_gold": gold.get("source"), "pred": text})
+            details.append(item)
+            bucket = by_source.setdefault(gold.get("source"), Counter())
+            for key in ("json_ok", "source", "databases", "tables", "steps", "full"):
+                totals[key] += int(item[key])
+                bucket[key] += int(item[key])
+            bucket["n"] += 1
+            totals["n"] += 1
+        done = start + len(chunk)
+        if done % (batch * 2) == 0 or done == len(rows):
+            print(f"{done}/{len(rows)} full {totals['full']}/{totals['n']}", flush=True)
 
     n = totals["n"] or 1
     summary = {
