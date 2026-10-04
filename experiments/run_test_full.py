@@ -498,7 +498,7 @@ def _generate(task: dict, client, engine, config) -> tuple[str, str, bool]:
     return text, error, True
 
 
-def infer(out: Path, shard: int, shards: int, base_url: str, device: str) -> None:
+def infer(out: Path, shard: int, shards: int, base_url: str, device: str, adapter: str) -> None:
     rows = json.loads((out / "QA_test.json").read_text(encoding="utf-8"))
     cards = load_cards()
     chosen = [row for index, row in enumerate(rows) if index % shards == shard]
@@ -521,6 +521,7 @@ def infer(out: Path, shard: int, shards: int, base_url: str, device: str) -> Non
 
         engine = TransformersEngine(
             MODEL,
+            adapters=[adapter] if adapter else None,
             model_type="qwen3_5",
             template_type="qwen3_5",
             torch_dtype=torch.float32 if device == "cpu" else torch.bfloat16,
@@ -529,6 +530,11 @@ def infer(out: Path, shard: int, shards: int, base_url: str, device: str) -> Non
             use_hf=True,
             max_batch_size=1,
         )
+        if adapter:
+            (out / "adapter.json").write_text(
+                json.dumps({"path": adapter}, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
         engine.template.enable_thinking = False
         config = RequestConfig(max_tokens=1024, temperature=0)
     else:
@@ -578,8 +584,18 @@ def merge(out: Path) -> None:
     enriched = json.loads((out / "QA_test.json").read_text(encoding="utf-8"))
     by_source = Counter(row["source"] for row in rows)
     questions = {row["question_id"] for row in rows}
+    adapter_path = ""
+    adapter_file = out / "adapter.json"
+    if adapter_file.exists():
+        adapter_path = json.loads(adapter_file.read_text(encoding="utf-8")).get("path") or ""
+    note = "业务规则相似度 >= 0.65，相似案例同一库且相似度 >= 0.6。执行失败会重写一次。"
+    if adapter_path:
+        note = "生成器加载 LoRA " + adapter_path + "。" + note
+    else:
+        note = "未微调生成器。" + note
     metrics = {
-        "experiment": "test-full-v1",
+        "experiment": out.name,
+        "adapter": adapter_path,
         "data": str(out / "QA_test.json"),
         "questions_in_data": len(enriched),
         "router_ok": sum(1 for row in enriched if row.get("router_ok")),
@@ -587,7 +603,7 @@ def merge(out: Path) -> None:
         "calls": len(rows),
         "by_source": dict(by_source),
         "missing_table_calls": sum(1 for row in rows if row.get("missing_tables")),
-        "note": "未微调生成器。业务规则相似度 >= 0.65，相似案例同一库且相似度 >= 0.6。执行失败会重写一次。",
+        "note": note,
         "retried": sum(1 for row in rows if row.get("retried")),
     }
     (out / "metrics.json").write_text(json.dumps(metrics, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -632,6 +648,7 @@ def main() -> None:
     parser.add_argument("--shards", type=int, default=1)
     parser.add_argument("--base-url", default="http://127.0.0.1:8002/v1")
     parser.add_argument("--device", choices=["api", "cpu", "cuda"], default="api")
+    parser.add_argument("--adapter", default="", help="生成器 LoRA checkpoint 目录")
     args = parser.parse_args()
     if args.stage == "route":
         route(args.output, args.batch_size)
@@ -640,7 +657,7 @@ def main() -> None:
     elif args.stage == "assemble":
         assemble(args.output)
     elif args.stage == "infer":
-        infer(args.output, args.shard, args.shards, args.base_url, args.device)
+        infer(args.output, args.shard, args.shards, args.base_url, args.device, args.adapter)
     elif args.stage == "submit":
         submit(args.output)
     else:
