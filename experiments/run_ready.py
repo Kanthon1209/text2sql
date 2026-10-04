@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""跑当前标注就能支撑的四组生成实验：E01、E02、E03、E05。
+"""跑标注就能支撑的生成实验：E01、E02、E03、E05、E09。
 
 数据是 /data/data/v2-w/train_eknow.json。Router 用其中的 db、database_names、table_names，
 不调用已训练的 Router。知识点只用该文件里的 knowledge_ids。
-E04、E06–E14 需要 Router 预测、检索器、相似案例或生成器 LoRA，本脚本不跑。
+E09 用表卡片代替整段 DDL。相似案例取 similar_top10_scored.json 里与本题同一数据源的前 2 条，排除本题，附上问题和 Golden SQL。
+E04、E06–E08、E10–E14 需要 Router 预测或生成器 LoRA，本脚本不跑。
 
 结果写到 /data/k/runs/experiments/<编号>/。中断后重跑会跳过已完成的题目。
 """
@@ -20,12 +21,16 @@ from pathlib import Path
 
 sys.path.insert(0, "/data/k/generator")
 from prompt import present_schema, system_for  # noqa: E402
-from schema import load_tables, lookup  # noqa: E402
+from schema import load_cards, load_tables, lookup, lookup_cards  # noqa: E402
 
 DATA = Path("/data/data/v2-w/train_eknow.json")
 KNOWLEDGE = Path("/data/data/v2-w/knowledge.json")
+SIMILAR = Path("/data/data/v2-w/similar_top10_scored.json")
 OUT = Path("/data/k/runs/experiments")
-READY = ("E01", "E02", "E03", "E05")
+READY = ("E01", "E02", "E03", "E05", "E09")
+WITH_SCHEMA = {"E03", "E05", "E09"}
+WITH_KNOWLEDGE = {"E05", "E09"}
+CASE_K = 2
 
 
 def norm(text: str) -> str:
@@ -141,7 +146,54 @@ def system_text(experiment: str, source: str) -> str:
     return system_for(source)
 
 
-def compose(experiment: str, question: str, route: dict | None, schema: str | None, knowledge: list[str] | None, note: str) -> str:
+def gold_text(row: dict) -> str:
+    if row.get("query"):
+        return row["query"]
+    return "query1:\n" + row.get("query1", "") + "\nquery2:\n" + row.get("query2", "")
+
+
+def question_source(row: dict) -> str:
+    return row.get("db") or "CROSS"
+
+
+def load_cases(rows: list[dict]) -> dict[int, list[dict]]:
+    """每题最多 2 条相似案例。丢掉本题，并且只保留同一数据源。"""
+    scored = json.loads(SIMILAR.read_text(encoding="utf-8"))
+    by_id = {int(row["question_id"]): row for row in rows}
+    found: dict[int, list[dict]] = {}
+    for row in rows:
+        qid = int(row["question_id"])
+        source = question_source(row)
+        picked = []
+        for item in scored.get(str(qid), []):
+            other = int(item["question_id"])
+            if other == qid or other not in by_id:
+                continue
+            neighbor = by_id[other]
+            if question_source(neighbor) != source:
+                continue
+            picked.append({
+                "question_id": other,
+                "question": neighbor["question"],
+                "query": gold_text(neighbor),
+            })
+            if len(picked) >= CASE_K:
+                break
+        found[qid] = picked
+    return found
+
+
+def render_cases(cases: list[dict]) -> str:
+    if not cases:
+        return "相似案例：无"
+    lines = ["相似案例："]
+    for index, case in enumerate(cases, start=1):
+        lines.append(f"示例{index}问题：{case['question']}")
+        lines.append(f"示例{index}查询：{case['query']}")
+    return "\n".join(lines)
+
+
+def compose(experiment: str, question: str, route: dict | None, schema: str | None, knowledge: list[str] | None, note: str, cases: list[dict] | None = None) -> str:
     parts = [f"问题：{question}"]
     if route is not None:
         parts.append("数据源：" + route["source"])
@@ -149,15 +201,18 @@ def compose(experiment: str, question: str, route: dict | None, schema: str | No
         parts.append("表名：" + ("、".join(route["tables"]) or "无"))
     if note:
         parts.append(note)
-    if experiment in ("E03", "E05"):
+    if experiment in WITH_SCHEMA:
         shown = present_schema((route or {}).get("source", ""), schema or "")
-        parts.append("Schema：\n" + (shown or "无"))
-    if experiment == "E05":
+        title = "表卡片" if experiment == "E09" else "Schema"
+        parts.append(f"{title}：\n" + (shown or "无"))
+    if experiment in WITH_KNOWLEDGE:
         parts.append("知识：\n" + ("\n".join(knowledge or []) or "无"))
+    if experiment == "E09":
+        parts.append(render_cases(cases or []))
     return "\n".join(parts)
 
 
-def tasks_for(experiment: str, row: dict, tables: dict[str, str], bare: dict[str, list[str]], knowledge: dict[int, str]) -> list[dict]:
+def tasks_for(experiment: str, row: dict, tables: dict[str, str], bare: dict[str, list[str]], knowledge: dict[int, str], cases: dict[int, list[dict]] | None = None, cards: dict | None = None) -> list[dict]:
     resolved = resolve(row, tables, bare)
     if row.get("db"):
         steps = [{
@@ -184,16 +239,24 @@ def tasks_for(experiment: str, row: dict, tables: dict[str, str], bare: dict[str
     made = []
     for step in steps:
         schema, missing = ("", [])
-        if experiment in ("E03", "E05"):
+        if experiment == "E09":
+            schema, missing = lookup_cards(cards or {}, step["qualified"])
+        elif experiment in WITH_SCHEMA:
             schema, missing = lookup(tables, step["qualified"])
         texts = []
         unknown = []
-        if experiment == "E05":
+        if experiment in WITH_KNOWLEDGE:
             for kid in row.get("knowledge_ids") or []:
                 if int(kid) in knowledge:
                     texts.append(knowledge[int(kid)])
                 else:
                     unknown.append(int(kid))
+        examples = []
+        if experiment == "E09":
+            examples = [
+                case for case in (cases or {}).get(int(row["question_id"]), [])
+                if case["question_id"] != int(row["question_id"])
+            ]
         route = None if experiment == "E01" else {
             "source": step["source"],
             "databases": step["databases"],
@@ -211,7 +274,7 @@ def tasks_for(experiment: str, row: dict, tables: dict[str, str], bare: dict[str
             "unknown_knowledge_ids": unknown,
             "messages": [
                 {"role": "system", "content": system_text(experiment, step["source"])},
-                {"role": "user", "content": compose(experiment, row["question"], route, schema, texts, step["note"])},
+                {"role": "user", "content": compose(experiment, row["question"], route, schema, texts, step["note"], examples)},
             ],
         })
     return made
@@ -255,7 +318,7 @@ def summarize(path: Path) -> dict:
     }
 
 
-def run_one(experiment: str, rows: list[dict], tables, bare, knowledge, client, out: Path, limit: int) -> dict:
+def run_one(experiment: str, rows: list[dict], tables, bare, knowledge, cases, client, out: Path, limit: int, cards: dict | None = None) -> dict:
     dest = out / experiment
     dest.mkdir(parents=True, exist_ok=True)
     pred = dest / "predictions.jsonl"
@@ -263,7 +326,7 @@ def run_one(experiment: str, rows: list[dict], tables, bare, knowledge, client, 
     chosen = rows[:limit] if limit else rows
     pending = []
     for row in chosen:
-        for task in tasks_for(experiment, row, tables, bare, knowledge):
+        for task in tasks_for(experiment, row, tables, bare, knowledge, cases, cards):
             if (task["question_id"], task["step"]) not in finished:
                 pending.append(task)
     print(f"{experiment} 待跑 {len(pending)} 已完成 {len(finished)}", flush=True)
@@ -301,7 +364,7 @@ def run_one(experiment: str, rows: list[dict], tables, bare, knowledge, client, 
     metrics.update({
         "experiment": experiment,
         "data": str(DATA),
-        "note": "字符串是否一致。评测集是带标注的训练题，不是 QA_test.json，也不是执行正确率。",
+        "note": "字符串是否一致。评测集是带标注的训练题，不是 QA_test.json，也不是执行正确率。E09 的相似案例已排除本题。",
     })
     (dest / "metrics.json").write_text(json.dumps(metrics, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(metrics, ensure_ascii=False), flush=True)
@@ -325,11 +388,13 @@ def main() -> None:
     tables = load_tables()
     bare = bare_index(tables)
     knowledge = load_knowledge()
+    cases = load_cases(rows) if "E09" in names else {}
+    cards = load_cards() if "E09" in names else {}
     if args.dry_run:
         sample = rows[:1] + [row for row in rows if row["question_id"] in (2070, 2491, 2936)]
         for name in names:
             for row in sample:
-                for task in tasks_for(name, row, tables, bare, knowledge):
+                for task in tasks_for(name, row, tables, bare, knowledge, cases, cards):
                     print("=" * 20, name, row["question_id"], "step", task["step"])
                     print(task["messages"][0]["content"])
                     print(task["messages"][1]["content"][:800])
@@ -338,9 +403,15 @@ def main() -> None:
     client = OpenAI(base_url=args.base_url, api_key="EMPTY")
     args.output.mkdir(parents=True, exist_ok=True)
     digest = hashlib.sha256(args.data.read_bytes()).hexdigest()
-    summary = {"data": str(args.data), "sha256": digest, "experiments": {}}
+    summary_path = args.output / "summary.json"
+    if summary_path.exists():
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    else:
+        summary = {"experiments": {}}
+    summary["data"] = str(args.data)
+    summary["sha256"] = digest
     for name in names:
-        summary["experiments"][name] = run_one(name, rows, tables, bare, knowledge, client, args.output, args.limit)
+        summary["experiments"][name] = run_one(name, rows, tables, bare, knowledge, cases, client, args.output, args.limit, cards)
         (args.output / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
