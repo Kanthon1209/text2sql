@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+log/
+run/
+*.pid
+
+# 训练权重由 train.sh 再生成
+*.safetensors
+optimizer.pt
+training_args.bin
+rng_state.pth
+scheduler.pt
+
+# 逐题预测和训练日志。metrics.json、summary.json 仍入库
+runs/**/predictions.jsonl
+runs/**/train.jsonl
+runs/**/train.log
+runs/**/train.log.prev
+runs/**/logging.jsonl
+runs/**/run.log

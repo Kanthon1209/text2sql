@@ -1,0 +1,17 @@
+{
+  "source": "/data/data/v2-k/QA_train.json",
+  "output": "/data/k/runs/router-r0/train.jsonl",
+  "variant": "router-r0",
+  "seed_note": "导出无随机。题库顺序与 QA_train.json 一致。",
+  "rows": 5830,
+  "by_source": {
+    "MYSQL": 1969,
+    "Elasticsearch": 370,
+    "POSTGRESQL": 410,
+    "CROSS": 90,
+    "SQLite": 2991
+  },
+  "skipped_parse_failed": [],
+  "sha256": "ef068457e192eb8ffafe670cc4e61d52696a74c8197386e6a0ac7ffdc26563ff",
+  "system": "你是数据源路由器。根据问题判断数据源、数据库和数据表。只输出一个 JSON 对象，不要 SQL，不要解释。\n单源格式：{\"source\":\"MYSQL\",\"databases\":[\"库名\"],\"tables\":[\"库名.表名\"]}\n跨源格式：{\"source\":\"CROSS\",\"databases\":[\"库名\"],\"tables\":[\"库名.表名\"],\"steps\":[{\"db\":\"MYSQL\",\"databases\":[\"库名\"],\"tables\":[\"库名.表名\"]}]}\nsource 只能是 MYSQL、SQLite、POSTGRESQL、Elasticsearch、CROSS。"
+}

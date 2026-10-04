@@ -1,0 +1,36 @@
+{
+  "calls": 5830,
+  "call_exact": 0,
+  "call_exact_rate": 0.0,
+  "questions": 5830,
+  "question_exact": 0,
+  "question_exact_rate": 0.0,
+  "by_source": {
+    "MYSQL": {
+      "n": 1969,
+      "exact": 0
+    },
+    "Elasticsearch": {
+      "n": 370,
+      "exact": 0
+    },
+    "POSTGRESQL": {
+      "n": 410,
+      "exact": 0
+    },
+    "CROSS": {
+      "n": 90,
+      "exact": 0
+    },
+    "SQLite": {
+      "n": 2991,
+      "exact": 0
+    }
+  },
+  "missing_schema_calls": 0,
+  "database_filled_calls": 780,
+  "calls_with_knowledge_ids": 3510,
+  "experiment": "E01",
+  "data": "/data/data/v2-w/train_eknow.json",
+  "note": "字符串是否一致。评测集是带标注的训练题，不是 QA_test.json，也不是执行正确率。"
+}
