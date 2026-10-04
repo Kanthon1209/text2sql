@@ -18,6 +18,45 @@ def system_for(source: str) -> str:
     return _SYSTEM.get(source, _SYSTEM["MYSQL"])
 
 
+_CARD_TAIL = "只使用表卡片中给出的表和字段。不要添加题目里没有的过滤条件。知识中的单位换算照做。只输出查询本身，不要解释，不要 Markdown。"
+
+_CARD_SYSTEM = {
+    "MYSQL": (
+        "你是 MYSQL 查询生成器。根据问题、表卡片和知识生成一条只读 SQL。"
+        "表名写库名.表名，例如 transportation.vehicle。"
+        "业务库和 common、education_2024 和 education_2025 写在同一条 SQL 里。"
+        "日期用 DATE_FORMAT。education 的 date_key 是整数，写成 20240101，不加引号。不要用 STRFTIME。"
+        + _CARD_TAIL
+    ),
+    "SQLite": (
+        "你是 SQLite 查询生成器。根据问题、表卡片和知识生成一条只读 SQL。"
+        "表名保持数据库前缀，例如 book_publishing_company.sales。"
+        "年份和月份用 STRFTIME('%Y', 列)、STRFTIME('%m', 列)。不要用 DATE_FORMAT、NOW()、INTERVAL。"
+        + _CARD_TAIL
+    ),
+    "POSTGRESQL": (
+        "你是 POSTGRESQL 查询生成器。根据问题、表卡片和知识生成一条只读 SQL。"
+        "表名不要加 public. 前缀，标识符不要加双引号。"
+        "ST_MakePoint(经度, 纬度)，经度在前。距离用 geom::geography，单位是米。"
+        "时间窗写成 NOW() - INTERVAL '24 hours'。不要用 DATE_FORMAT。"
+        + _CARD_TAIL
+    ),
+    "Elasticsearch": (
+        "你是 Elasticsearch 查询生成器。根据问题、表卡片和知识生成一个 JSON DSL。"
+        "只使用 bool、geo_distance、geo_polygon、geo_bounding_box、term、range。"
+        "圆形用 geo_distance，矩形用 geo_bounding_box，不要改成 geo_shape。"
+        "location 里先写 lat 再写 lon。返回字段用 \"_source\"。"
+        "只有纯聚合才写 size: 0。city、level 这类 keyword 用 term，不要用 match。"
+        + _CARD_TAIL
+    ),
+}
+
+
+def system_for_cards(source: str) -> str:
+    """E09 使用。按数据源附带方言约束，上下文是表卡片而不是整段 DDL。"""
+    return _CARD_SYSTEM.get(source, _CARD_SYSTEM["MYSQL"])
+
+
 def present_schema(source: str, schema: str) -> str:
     """PostgreSQL 标注查询不写 public.，展示给模型的 Schema 去掉这个前缀。"""
     text = schema or ""

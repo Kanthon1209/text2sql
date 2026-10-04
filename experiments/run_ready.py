@@ -20,7 +20,7 @@ from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, "/data/k/generator")
-from prompt import present_schema, system_for  # noqa: E402
+from prompt import present_schema, system_for, system_for_cards  # noqa: E402
 from schema import load_cards, load_tables, lookup, lookup_cards  # noqa: E402
 
 DATA = Path("/data/data/v2-w/train_eknow.json")
@@ -143,6 +143,8 @@ def system_text(experiment: str, source: str) -> str:
             return "你是 POSTGRESQL 查询生成器。根据问题、数据源、库名和表名生成一条只读 SQL。表名不要加 public. 前缀，标识符不要加双引号。地理条件使用 geom 和 PostGIS 函数，例如 ST_DWithin。只输出 SQL，不要解释，不要 Markdown。"
         extra = "表名保持数据库前缀。" if source == "SQLite" else ""
         return f"你是 {source} 查询生成器。根据问题、数据源、库名和表名生成一条只读 SQL。{extra}只输出 SQL，不要解释，不要 Markdown。"
+    if experiment == "E09":
+        return system_for_cards(source)
     return system_for(source)
 
 
