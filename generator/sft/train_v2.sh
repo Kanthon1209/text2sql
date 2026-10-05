@@ -2,9 +2,9 @@
 # 第二阶段生成器 LoRA：训练输入与测试时 v3 的提示词完全一致。
 # 数据由 export_jsonl_v2.py 生成：检索规则 0.65 过滤、相似案例同库 0.6、
 # 附加系统句、失败重写多轮样本（首轮 loss=False）。
-# 0 和 1 两张卡一起跑。0 号卡上另有一个 vLLM 约占 15GB，本进程每卡控制在 25GB 以内。
-# 每卡批次 4，梯度累计 2，两卡全局批次仍是 16。
-# 梯度检查点保持打开：最长样本 5155 token，关掉检查点会在 0 号卡上撑爆剩余显存。
+# 0 和 1 两张卡一起跑。0 号卡上另有一个 vLLM 约占 15GB。
+# 每卡批次 1，梯度累计 8，两卡全局批次仍是 16。长样本在批次 4 时会撑爆 0 号卡。
+# 4 个 epoch 的权重都留下，测试集上第 2 个 epoch 优于最后一轮。
 # max_length 6144 保证不截断。
 set -euo pipefail
 
@@ -33,15 +33,15 @@ swift sft \
     --lora_dropout 0.05 \
     --learning_rate 1e-4 \
     --num_train_epochs 4 \
-    --per_device_train_batch_size 4 \
-    --gradient_accumulation_steps 2 \
+    --per_device_train_batch_size 1 \
+    --gradient_accumulation_steps 8 \
     --max_length 6144 \
     --warmup_ratio 0.05 \
     --gradient_checkpointing true \
     --seed 20261001 \
     --logging_steps 10 \
     --save_strategy epoch \
-    --save_total_limit 2 \
+    --save_total_limit 4 \
     --eval_strategy no \
     --report_to none \
     --dataloader_num_workers 2 \
