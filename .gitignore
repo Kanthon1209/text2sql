@@ -1,20 +1,38 @@
+# Python
 __pycache__/
 *.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# 服务进程和日志
 log/
 run/
 *.pid
+*.log
+*.log.prev
 
-# 训练权重由 train.sh 再生成
+# 权重、优化器、随机状态和向量缓存。训练或检索脚本可以再生成。
 *.safetensors
-optimizer.pt
-training_args.bin
-rng_state.pth
-scheduler.pt
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.npz
 
-# 逐题预测和训练日志。metrics.json、summary.json 仍入库
-runs/**/predictions.jsonl
-runs/**/train.jsonl
-runs/**/train.log
-runs/**/train.log.prev
-runs/**/logging.jsonl
-runs/**/run.log
+# 运行目录里的大产物：逐题预测、训练样本、组装输入和提交结果。
+# 指标、摘要、导出清单、检查点里的小配置仍可入库。
+runs/**/*.jsonl
+runs/**/sample_prompt.txt
+runs/**/QA_test.json
+runs/**/result.json
+runs/**/similar_top10.json
+runs/**/knowledge_rules.json
+runs/**/router_meta.json
+runs/**/adapter.json
+# swift 检查点里的训练状态。权重不入库，这些配置留在本地。
+# 已经跟踪的路由器检查点不受影响。
+runs/**/checkpoint-*/
+runs/**/last-checkpoint
+runs/**/args.json
