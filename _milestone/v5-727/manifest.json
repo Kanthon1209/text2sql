@@ -1,0 +1,45 @@
+{
+  "name": "v5",
+  "official_score": 727.4091,
+  "official_max": 1087,
+  "official_full": 277,
+  "official_questions": 400,
+  "local_vs_gpt": {
+    "equal": 268,
+    "diff": 115,
+    "pair_fail": 14,
+    "source_mismatch": 3,
+    "reference": "/data/submit/gpt-v1/result.json"
+  },
+  "git": "864c47c",
+  "base_model": "/data/models/Qwen3.5-4B",
+  "router": "/data/k/runs/router-r0/v3-20261003-191238/checkpoint-730",
+  "adapter_source": "/data/k/runs/generator-e09-sft2/v4-20261005-094854/checkpoint-740",
+  "swift_run_dir_note": "目录名里的 v4 是 ms-swift 的启动序号，不是提交 v4",
+  "epoch": 2,
+  "global_step": 740,
+  "not_used": "/data/k/runs/generator-e09-sft2/v4-20261005-094854/checkpoint-1110",
+  "train_script_commit": "4e8c4b3",
+  "export_script_commit": "20cf65e",
+  "inference": {
+    "entry": "code/run_test_full.py",
+    "device": "cuda",
+    "shards": 2,
+    "assembled_input": "data/QA_test.json",
+    "assembled_from": "/data/k/runs/test-full-v3/QA_test.json",
+    "recall_path": "未执行。工作区里的 run_test_full.py 有未提交的表召回，本次提交复制的是已组装输入，没有 recall 字段"
+  },
+  "sha256": {
+    "weights/adapter_model.safetensors": "86fdc04ba9fa138377cedf06fac64def23cb07ef3abeeefc0b0c94824981600a",
+    "data/train.jsonl": "2043e7dae3ee31f8a1cdd1ed7297a782dfce4cf704bf41ac2c10d3cfca4f75b7",
+    "data/QA_test.json": "78ee6d5c4333fcde5378d4517c1846aa1271556d054d869c85aab1d570c3d385",
+    "data/schema_cards.json": "bfe842543aa7a4f693c3c923ed94051f71df1eb25a67d4afe10c98fb26c3542a",
+    "submit/result.json": "455952b256f79107cdcc2c9f8cddad75b4352f16a00b8ecaa745ddfe6927dcbc",
+    "code/run_test_full.py": "378e09d08f6c12cffeb015dfad5a0a438e16a86826a5e94add3920e2630fd093",
+    "code/train_v2.sh": "eb146388547ce04c42678b82d1c653e6757fb752c2dec264c72f30b62d6bd28e",
+    "code/export_jsonl_v2.py": "f9517c332356c79b5907091e52a22e7111bc44546cf6b64f709dcd5778c65dfe",
+    "generator/schema.py": "c32350334c9e4d8912848aec22837657a4ed5f4d1b2736580c7cfeab352ea8d9",
+    "generator/knowledge.py": "c98ad6cdc499c130321f9817b6c3454ca16134c10f6dc5dbcdedc3be52de7cb6",
+    "generator/prompt.py": "9e6d69c6977c27c642328a109855d83fc30ae58312c6082f44130f6798ef74b7"
+  }
+}
