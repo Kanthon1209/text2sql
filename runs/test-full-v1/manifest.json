@@ -1,0 +1,22 @@
+{
+  "source": "/data/raw/contest_8/QA_test.json",
+  "sha256": "c5aba24c0d9f8d5ab9aa80d6ca1044afc93bc2f1a1633c2426455a30f304efa9",
+  "output": "/data/k/runs/test-full-v1/QA_test.json",
+  "questions": 400,
+  "router_checkpoint": "/data/k/runs/router-r0/v3-20261003-191238/checkpoint-730",
+  "router_ok": 400,
+  "by_source": {
+    "MYSQL": 99,
+    "POSTGRESQL": 40,
+    "Elasticsearch": 50,
+    "CROSS": 12,
+    "SQLite": 199
+  },
+  "similar_cases": {
+    "1": 1,
+    "2": 399
+  },
+  "with_table_knowledge": 199,
+  "with_rule_knowledge": 400,
+  "prompt": "与 E09 相同：表卡片、知识点检索结果、同一数据源的 2 条相似案例。生成器不加 LoRA。"
+}

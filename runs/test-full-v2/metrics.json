@@ -1,0 +1,17 @@
+{
+  "experiment": "test-full-v1",
+  "data": "/data/k/runs/test-full-v2/QA_test.json",
+  "questions_in_data": 400,
+  "router_ok": 400,
+  "questions_predicted": 400,
+  "calls": 412,
+  "by_source": {
+    "MYSQL": 111,
+    "POSTGRESQL": 52,
+    "Elasticsearch": 50,
+    "SQLite": 199
+  },
+  "missing_table_calls": 4,
+  "note": "未微调生成器。业务规则相似度 >= 0.65，相似案例同一库且相似度 >= 0.6。执行失败会重写一次。",
+  "retried": 90
+}

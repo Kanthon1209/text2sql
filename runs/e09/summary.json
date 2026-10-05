@@ -1,0 +1,38 @@
+{
+  "experiments": {
+    "E09": {
+      "calls": 5920,
+      "call_exact": 1565,
+      "call_exact_rate": 0.2643581081081081,
+      "questions": 5830,
+      "question_exact": 1551,
+      "question_exact_rate": 0.2660377358490566,
+      "by_source": {
+        "MYSQL": {
+          "n": 2059,
+          "exact": 893
+        },
+        "Elasticsearch": {
+          "n": 370,
+          "exact": 87
+        },
+        "POSTGRESQL": {
+          "n": 500,
+          "exact": 88
+        },
+        "SQLite": {
+          "n": 2991,
+          "exact": 497
+        }
+      },
+      "missing_schema_calls": 0,
+      "database_filled_calls": 780,
+      "calls_with_knowledge_ids": 3510,
+      "experiment": "E09",
+      "data": "/data/data/v2-w/train_eknow.json",
+      "note": "字符串是否一致。评测集是带标注的训练题，不是 QA_test.json，也不是执行正确率。E09 的相似案例已排除本题。"
+    }
+  },
+  "data": "/data/data/v2-w/train_eknow.json",
+  "sha256": "843934fd0b2845daac8821231b5f9aa06850c97c13e328a1f8952fad62572a3c"
+}

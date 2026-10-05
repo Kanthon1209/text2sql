@@ -133,6 +133,38 @@
       "experiment": "E05",
       "data": "/data/data/v2-w/train_eknow.json",
       "note": "字符串是否一致。评测集是带标注的训练题，不是 QA_test.json，也不是执行正确率。"
+    },
+    "E09": {
+      "calls": 5920,
+      "call_exact": 1582,
+      "call_exact_rate": 0.26722972972972975,
+      "questions": 5830,
+      "question_exact": 1560,
+      "question_exact_rate": 0.26758147512864494,
+      "by_source": {
+        "MYSQL": {
+          "n": 2059,
+          "exact": 918
+        },
+        "Elasticsearch": {
+          "n": 370,
+          "exact": 69
+        },
+        "POSTGRESQL": {
+          "n": 500,
+          "exact": 87
+        },
+        "SQLite": {
+          "n": 2991,
+          "exact": 508
+        }
+      },
+      "missing_schema_calls": 0,
+      "database_filled_calls": 780,
+      "calls_with_knowledge_ids": 3510,
+      "experiment": "E09",
+      "data": "/data/data/v2-w/train_eknow.json",
+      "note": "字符串是否一致。评测集是带标注的训练题，不是 QA_test.json，也不是执行正确率。E09 的相似案例已排除本题。"
     }
   }
 }

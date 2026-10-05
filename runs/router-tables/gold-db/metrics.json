@@ -1,0 +1,35 @@
+{
+  "n": 5830,
+  "table_exact": 3223,
+  "table_exact_rate": 0.5528301886792453,
+  "mismatch": {
+    "有对有错": 458,
+    "一致": 3223,
+    "少表": 669,
+    "多表": 1374,
+    "完全不同": 106
+  },
+  "by_source": {
+    "MYSQL": {
+      "n": 1969,
+      "exact": 1293
+    },
+    "Elasticsearch": {
+      "n": 370,
+      "exact": 0
+    },
+    "POSTGRESQL": {
+      "n": 410,
+      "exact": 410
+    },
+    "CROSS": {
+      "n": 90,
+      "exact": 78
+    },
+    "SQLite": {
+      "n": 2991,
+      "exact": 1442
+    }
+  },
+  "note": "库名用训练集标注。基座 Qwen3.5-4B 从该库的表名单勾选，未加载 Router LoRA。"
+}

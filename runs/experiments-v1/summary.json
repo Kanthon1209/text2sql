@@ -1,0 +1,102 @@
+{
+  "data": "/data/data/v2-w/train_eknow.json",
+  "sha256": "843934fd0b2845daac8821231b5f9aa06850c97c13e328a1f8952fad62572a3c",
+  "experiments": {
+    "E02": {
+      "calls": 5920,
+      "call_exact": 61,
+      "call_exact_rate": 0.010304054054054055,
+      "questions": 5830,
+      "question_exact": 61,
+      "question_exact_rate": 0.0104631217838765,
+      "by_source": {
+        "MYSQL": {
+          "n": 2059,
+          "exact": 16
+        },
+        "SQLite": {
+          "n": 2991,
+          "exact": 21
+        },
+        "Elasticsearch": {
+          "n": 370,
+          "exact": 0
+        },
+        "POSTGRESQL": {
+          "n": 500,
+          "exact": 24
+        }
+      },
+      "missing_schema_calls": 0,
+      "database_filled_calls": 780,
+      "calls_with_knowledge_ids": 3510,
+      "experiment": "E02",
+      "data": "/data/data/v2-w/train_eknow.json",
+      "note": "字符串是否一致。评测集是带标注的训练题，不是 QA_test.json，也不是执行正确率。"
+    },
+    "E03": {
+      "calls": 5920,
+      "call_exact": 236,
+      "call_exact_rate": 0.03986486486486487,
+      "questions": 5830,
+      "question_exact": 236,
+      "question_exact_rate": 0.04048027444253859,
+      "by_source": {
+        "MYSQL": {
+          "n": 2059,
+          "exact": 97
+        },
+        "SQLite": {
+          "n": 2991,
+          "exact": 104
+        },
+        "Elasticsearch": {
+          "n": 370,
+          "exact": 0
+        },
+        "POSTGRESQL": {
+          "n": 500,
+          "exact": 35
+        }
+      },
+      "missing_schema_calls": 0,
+      "database_filled_calls": 780,
+      "calls_with_knowledge_ids": 3510,
+      "experiment": "E03",
+      "data": "/data/data/v2-w/train_eknow.json",
+      "note": "字符串是否一致。评测集是带标注的训练题，不是 QA_test.json，也不是执行正确率。"
+    },
+    "E05": {
+      "calls": 5920,
+      "call_exact": 288,
+      "call_exact_rate": 0.04864864864864865,
+      "questions": 5830,
+      "question_exact": 288,
+      "question_exact_rate": 0.049399656946826756,
+      "by_source": {
+        "MYSQL": {
+          "n": 2059,
+          "exact": 125
+        },
+        "SQLite": {
+          "n": 2991,
+          "exact": 128
+        },
+        "Elasticsearch": {
+          "n": 370,
+          "exact": 0
+        },
+        "POSTGRESQL": {
+          "n": 500,
+          "exact": 35
+        }
+      },
+      "missing_schema_calls": 0,
+      "database_filled_calls": 780,
+      "calls_with_knowledge_ids": 3510,
+      "experiment": "E05",
+      "data": "/data/data/v2-w/train_eknow.json",
+      "note": "字符串是否一致。评测集是带标注的训练题，不是 QA_test.json，也不是执行正确率。"
+    }
+  }
+}

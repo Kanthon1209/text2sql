@@ -1,0 +1,18 @@
+{
+  "experiment": "test-full-v4",
+  "adapter": "/data/k/runs/generator-e09/v0-20261004-182257/checkpoint-1480",
+  "data": "/data/k/runs/test-full-v4/QA_test.json",
+  "questions_in_data": 400,
+  "router_ok": 400,
+  "questions_predicted": 400,
+  "calls": 412,
+  "by_source": {
+    "MYSQL": 111,
+    "POSTGRESQL": 52,
+    "Elasticsearch": 50,
+    "SQLite": 199
+  },
+  "missing_table_calls": 4,
+  "note": "生成器加载 LoRA /data/k/runs/generator-e09/v0-20261004-182257/checkpoint-1480。业务规则相似度 >= 0.65，相似案例同一库且相似度 >= 0.6。执行失败会重写一次。",
+  "retried": 44
+}

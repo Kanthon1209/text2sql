@@ -1,0 +1,53 @@
+{
+  "checkpoint": "/data/k/runs/router-r0/v3-20261003-191238/checkpoint-730",
+  "n": 5830,
+  "note": "评测集就是训练集，表示模型是否学会这 5830 条映射。",
+  "source_acc": 0.9991423670668954,
+  "database_acc": 0.962607204116638,
+  "table_acc": 0.867409948542024,
+  "step_acc": 0.9998284734133791,
+  "full_acc": 0.867409948542024,
+  "json_ok": 1.0,
+  "by_source": {
+    "MYSQL": {
+      "n": 1969,
+      "full": 1730,
+      "source": 1968,
+      "databases": 1800,
+      "tables": 1730,
+      "steps": 1969
+    },
+    "Elasticsearch": {
+      "n": 370,
+      "full": 370,
+      "source": 370,
+      "databases": 370,
+      "tables": 370,
+      "steps": 370
+    },
+    "POSTGRESQL": {
+      "n": 410,
+      "full": 407,
+      "source": 407,
+      "databases": 407,
+      "tables": 407,
+      "steps": 410
+    },
+    "CROSS": {
+      "n": 90,
+      "full": 89,
+      "source": 89,
+      "databases": 89,
+      "tables": 89,
+      "steps": 89
+    },
+    "SQLite": {
+      "n": 2991,
+      "full": 2461,
+      "source": 2991,
+      "databases": 2946,
+      "tables": 2461,
+      "steps": 2991
+    }
+  }
+}

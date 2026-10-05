@@ -1,0 +1,18 @@
+{
+  "table_notes": 1410,
+  "rules": 247,
+  "recipes_held_out": 143,
+  "rule_k": 3,
+  "table_questions": 2959,
+  "table_gold": 13946,
+  "table_gold_recalled": 13946,
+  "table_recall": 1.0,
+  "table_questions_without_database": 0,
+  "rule_questions": 551,
+  "rule_gold": 1106,
+  "rule_gold_recalled": 480,
+  "rule_recall_at_3": 0.433996,
+  "rule_recall_at_3_mean": 0.659,
+  "rule_hit_at_3": 0.784029,
+  "note": "字段说明用题目标注的库名和表名精确匹配。业务规则只在 247 条非字段知识中取前 3 条。143 条未点明表名的计算公式不返回。"
+}

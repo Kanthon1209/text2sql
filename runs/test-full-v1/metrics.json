@@ -1,0 +1,16 @@
+{
+  "experiment": "test-full-v1",
+  "data": "/data/k/runs/test-full-v1/QA_test.json",
+  "questions_in_data": 400,
+  "router_ok": 400,
+  "questions_predicted": 400,
+  "calls": 412,
+  "by_source": {
+    "MYSQL": 111,
+    "POSTGRESQL": 52,
+    "Elasticsearch": 50,
+    "SQLite": 199
+  },
+  "missing_table_calls": 4,
+  "note": "测试集没有标准查询。提示词与训练集 E09 相同，三元组来自 Router R0，知识来自检索器，相似案例来自训练题。生成器未微调。"
+}

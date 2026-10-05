@@ -1,0 +1,6 @@
+{
+  "experiment": "E01",
+  "questions": 400,
+  "data": "/data/raw/contest_8/QA_test.json",
+  "note": "测试集没有标准查询，只保存生成结果，没有字符串一致率。"
+}
