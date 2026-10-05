@@ -4,6 +4,7 @@
 # 0 号卡和 1 号卡一起训。每卡 batch 1、梯度累积 8，全局批次仍是 16。
 # 套上 Qwen3.5 对话模板后最长 2728 token，max_length 4096 不会截断。
 # 4 个 epoch：SQL 比 Router 的短 JSON 长，2 遍不够；再多主要是贴训练题原句。
+# 不设 save_total_limit。每个 epoch 的 checkpoint 都保留，用来测效果。
 set -euo pipefail
 
 source /root/miniconda3/etc/profile.d/conda.sh
@@ -46,7 +47,6 @@ swift sft \
   --seed 20261001 \
   --logging_steps 10 \
   --save_strategy epoch \
-  --save_total_limit 2 \
   --eval_strategy no \
   --report_to none \
   --dataloader_num_workers 2 \

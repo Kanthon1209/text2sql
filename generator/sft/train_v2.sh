@@ -5,7 +5,8 @@
 # 0 和 1 两张卡一起跑。
 # 每卡批次 2，梯度累计 4，全局批次 16。
 # 批次 4 会在长样本上再申请约 10GB 的词表张量，40GB 卡放不下。
-# 4 个 epoch 的权重都留下，测试集上第 2 个 epoch 优于最后一轮。
+# 不设 save_total_limit，每个 epoch 的 checkpoint 都保留。
+# 测试集上第 2 个 epoch 优于最后一轮。
 # max_length 6144 保证不截断。
 set -euo pipefail
 
@@ -43,7 +44,6 @@ swift sft \
     --seed 20261001 \
     --logging_steps 10 \
     --save_strategy epoch \
-    --save_total_limit 4 \
     --eval_strategy no \
     --report_to none \
     --dataloader_num_workers 2 \

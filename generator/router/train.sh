@@ -3,6 +3,7 @@
 # 复现：先运行 export_jsonl.py，再运行本脚本。超参全部写在这里。
 # Qwen3.5 在 swift 里走视觉加载器，context_8 需要：
 #   pip install "qwen-vl-utils>=0.0.14" decord -i https://pypi.org/simple
+# 不设 save_total_limit。每个 epoch 的 checkpoint 都保留，用来测效果。
 set -euo pipefail
 
 source /root/miniconda3/etc/profile.d/conda.sh
@@ -43,7 +44,6 @@ swift sft \
   --seed 20261001 \
   --logging_steps 10 \
   --save_strategy epoch \
-  --save_total_limit 2 \
   --eval_strategy no \
   --report_to none \
   --dataloader_num_workers 2 \
