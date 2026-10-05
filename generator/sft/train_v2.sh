@@ -3,7 +3,7 @@
 # 数据由 export_jsonl_v2.py 生成：检索规则 0.65 过滤、相似案例同库 0.6、
 # 附加系统句、失败重写多轮样本（首轮 loss=False）。
 # 0 和 1 两张卡一起跑。0 号卡上另有一个 vLLM 约占 15GB。
-# 每卡批次 1，梯度累计 8，两卡全局批次仍是 16。长样本在批次 4 时会撑爆 0 号卡。
+# 每卡批次 2，梯度累计 4，两卡全局批次仍是 16。批次 4 的长样本会撑爆 0 号卡。
 # 4 个 epoch 的权重都留下，测试集上第 2 个 epoch 优于最后一轮。
 # max_length 6144 保证不截断。
 set -euo pipefail
@@ -15,6 +15,7 @@ export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0,1}"
 export NPROC_PER_NODE="${NPROC_PER_NODE:-2}"
 export MASTER_PORT="${MASTER_PORT:-29502}"
 export PYTHONHASHSEED=20261001
+export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 
 swift sft \
     --model "$MODEL" \
@@ -33,8 +34,8 @@ swift sft \
     --lora_dropout 0.05 \
     --learning_rate 1e-4 \
     --num_train_epochs 4 \
-    --per_device_train_batch_size 1 \
-    --gradient_accumulation_steps 8 \
+    --per_device_train_batch_size 2 \
+    --gradient_accumulation_steps 4 \
     --max_length 6144 \
     --warmup_ratio 0.05 \
     --gradient_checkpointing true \
