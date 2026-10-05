@@ -125,6 +125,21 @@ def static_error(source: str, step: int, sql: str, tables: list[str]) -> str:
     return ""
 
 
+def empty_postgresql(sql: str) -> str:
+    """纯 PostgreSQL 官方只看结果是否非空。执行成功但零行时返回重写理由。"""
+    try:
+        import sys
+        sys.path.insert(0, "/data/lj")
+        from verify_sql import _run_one
+
+        rows = _run_one("postgresql", sql, 12, None)
+    except Exception:
+        return ""
+    if rows:
+        return ""
+    return "查询执行成功，但结果是空的。请放宽条件或改写，使它至少返回一行。只使用表卡片中的表和字段。"
+
+
 def execution_error(source: str, step: int, sql: str) -> str:
     if source == "Elasticsearch":
         trial = sql

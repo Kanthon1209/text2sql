@@ -369,6 +369,10 @@ def build_tasks(row: dict, cards: dict) -> list[dict]:
         route_step = {"source": step["db"], "databases": list(step.get("databases") or []), "tables": tables}
         system = system_text("E09", step["db"])
         system += "提示词里没有出现的业务规则不要使用，不要据此添加过滤或分段。"
+        if step["db"] in {"MYSQL", "SQLite"}:
+            system += "如果某张表上已有列能直接回答问题，不要再 join 明细表。"
+            system += "只输出题目要求的列，不要多加题目没问的字段。"
+            system += "问「多出百分之多少」时，分母是被比较的那一项，不是较大的那一项。"
         if step["db"] == "Elasticsearch":
             system += "不要使用 geo_shape、match、match_phrase。"
         if source == "CROSS" and step_id == 1:
